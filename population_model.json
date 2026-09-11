@@ -1,0 +1,127 @@
+import json, os
+
+model = {
+  "model_version": "1.0.0",
+  "model_name": "Russian Adult Population Synthetic Model",
+  "geography": "Russia",
+  "population_scope": "residents aged 18+",
+  "base_population": 100000000,
+  "reference_year": 2025,
+  "synthetic": True,
+  "purpose": "Approximate partner-profile prevalence estimation. Not official population statistics.",
+  "age_bands": [
+    {"id":"18_24","min":18,"max":24},
+    {"id":"25_29","min":25,"max":29},
+    {"id":"30_34","min":30,"max":34},
+    {"id":"35_39","min":35,"max":39},
+    {"id":"40_49","min":40,"max":49},
+    {"id":"50_59","min":50,"max":59},
+    {"id":"60_69","min":60,"max":69},
+    {"id":"70_90","min":70,"max":90}
+  ],
+  "variables": {
+    "sex": ["male","female"],
+    "age": {"min":18,"max":90,"unit":"years"},
+    "income_monthly_rub": {"unit":"RUB/month","type":"personal_monthly_income"},
+    "marital_status": ["single","married","divorced","widowed"],
+    "children": ["0","1","2","3_plus"],
+    "education": ["secondary_or_less","vocational","higher"],
+    "height_cm": {"unit":"cm"},
+    "weight_kg": {"unit":"kg"},
+    "hair_color": ["blonde","light_brown","brown","dark","red","other"],
+    "eye_color": ["blue","gray","green","brown","hazel_other"],
+    "property": ["owns_housing","does_not_own_housing"],
+    "smoking": ["non_smoker","smoker","former_smoker"],
+    "alcohol": ["none_or_rare","occasional","regular","frequent"],
+    "employment_status": ["employee","entrepreneur","student","retired","unemployed","other_not_working"]
+  },
+  "sex_share": {"male":0.46,"female":0.54},
+  "age_distribution": {
+    "male":{"18_24":0.075,"25_29":0.055,"30_34":0.065,"35_39":0.070,"40_49":0.145,"50_59":0.155,"60_69":0.140,"70_90":0.295},
+    "female":{"18_24":0.065,"25_29":0.055,"30_34":0.065,"35_39":0.070,"40_49":0.145,"50_59":0.155,"60_69":0.140,"70_90":0.305}
+  },
+  "distributions": {
+    "marital_status": {
+      "male":{"18_24":{"single":0.94,"married":0.05,"divorced":0.01,"widowed":0.00},"25_29":{"single":0.62,"married":0.33,"divorced":0.05,"widowed":0.00},"30_34":{"single":0.38,"married":0.53,"divorced":0.09,"widowed":0.00},"35_39":{"single":0.25,"married":0.62,"divorced":0.12,"widowed":0.01},"40_49":{"single":0.17,"married":0.64,"divorced":0.17,"widowed":0.02},"50_59":{"single":0.12,"married":0.65,"divorced":0.17,"widowed":0.06},"60_69":{"single":0.09,"married":0.60,"divorced":0.18,"widowed":0.13},"70_90":{"single":0.07,"married":0.42,"divorced":0.16,"widowed":0.35}},
+      "female":{"18_24":{"single":0.92,"married":0.07,"divorced":0.01,"widowed":0.00},"25_29":{"single":0.50,"married":0.43,"divorced":0.07,"widowed":0.00},"30_34":{"single":0.27,"married":0.59,"divorced":0.13,"widowed":0.01},"35_39":{"single":0.18,"married":0.62,"divorced":0.18,"widowed":0.02},"40_49":{"single":0.14,"married":0.59,"divorced":0.22,"widowed":0.05},"50_59":{"single":0.11,"married":0.54,"divorced":0.22,"widowed":0.13},"60_69":{"single":0.08,"married":0.44,"divorced":0.18,"widowed":0.30},"70_90":{"single":0.06,"married":0.25,"divorced":0.13,"widowed":0.56}}
+    },
+    "education": {
+      "male":{"18_24":{"secondary_or_less":0.38,"vocational":0.38,"higher":0.24},"25_29":{"secondary_or_less":0.16,"vocational":0.34,"higher":0.50},"30_34":{"secondary_or_less":0.17,"vocational":0.36,"higher":0.47},"35_39":{"secondary_or_less":0.17,"vocational":0.36,"higher":0.47},"40_49":{"secondary_or_less":0.20,"vocational":0.42,"higher":0.38},"50_59":{"secondary_or_less":0.25,"vocational":0.45,"higher":0.30},"60_69":{"secondary_or_less":0.30,"vocational":0.45,"higher":0.25},"70_90":{"secondary_or_less":0.38,"vocational":0.43,"higher":0.19}},
+      "female":{"18_24":{"secondary_or_less":0.34,"vocational":0.35,"higher":0.31},"25_29":{"secondary_or_less":0.10,"vocational":0.24,"higher":0.66},"30_34":{"secondary_or_less":0.11,"vocational":0.27,"higher":0.62},"35_39":{"secondary_or_less":0.11,"vocational":0.27,"higher":0.62},"40_49":{"secondary_or_less":0.14,"vocational":0.31,"higher":0.55},"50_59":{"secondary_or_less":0.20,"vocational":0.36,"higher":0.44},"60_69":{"secondary_or_less":0.27,"vocational":0.38,"higher":0.35},"70_90":{"secondary_or_less":0.39,"vocational":0.37,"higher":0.24}}
+    },
+    "children": {
+      "male":{"18_24":{"0":0.94,"1":0.05,"2":0.01,"3_plus":0.00},"25_29":{"0":0.69,"1":0.24,"2":0.06,"3_plus":0.01},"30_34":{"0":0.45,"1":0.34,"2":0.18,"3_plus":0.03},"35_39":{"0":0.31,"1":0.34,"2":0.28,"3_plus":0.07},"40_49":{"0":0.24,"1":0.30,"2":0.34,"3_plus":0.12},"50_59":{"0":0.22,"1":0.29,"2":0.34,"3_plus":0.15},"60_69":{"0":0.24,"1":0.29,"2":0.31,"3_plus":0.16},"70_90":{"0":0.25,"1":0.28,"2":0.30,"3_plus":0.17}},
+      "female":{"18_24":{"0":0.95,"1":0.04,"2":0.01,"3_plus":0.00},"25_29":{"0":0.72,"1":0.21,"2":0.06,"3_plus":0.01},"30_34":{"0":0.47,"1":0.34,"2":0.16,"3_plus":0.03},"35_39":{"0":0.30,"1":0.35,"2":0.28,"3_plus":0.07},"40_49":{"0":0.22,"1":0.31,"2":0.34,"3_plus":0.13},"50_59":{"0":0.20,"1":0.30,"2":0.34,"3_plus":0.16},"60_69":{"0":0.22,"1":0.29,"2":0.31,"3_plus":0.18},"70_90":{"0":0.22,"1":0.28,"2":0.31,"3_plus":0.19}}
+    },
+    "employment_status": {
+      "male":{"18_24":{"employee":0.53,"entrepreneur":0.02,"student":0.35,"retired":0.00,"unemployed":0.06,"other_not_working":0.04},"25_29":{"employee":0.78,"entrepreneur":0.08,"student":0.02,"retired":0.00,"unemployed":0.06,"other_not_working":0.06},"30_59":{"employee":0.78,"entrepreneur":0.08,"student":0.01,"retired":0.01,"unemployed":0.06,"other_not_working":0.06},"60_69":{"employee":0.36,"entrepreneur":0.05,"student":0.00,"retired":0.52,"unemployed":0.03,"other_not_working":0.04},"70_90":{"employee":0.16,"entrepreneur":0.03,"student":0.00,"retired":0.72,"unemployed":0.03,"other_not_working":0.06}},
+      "female":{"18_24":{"employee":0.49,"entrepreneur":0.01,"student":0.41,"retired":0.00,"unemployed":0.05,"other_not_working":0.04},"25_29":{"employee":0.76,"entrepreneur":0.04,"student":0.02,"retired":0.00,"unemployed":0.06,"other_not_working":0.12},"30_54":{"employee":0.76,"entrepreneur":0.04,"student":0.01,"retired":0.01,"unemployed":0.06,"other_not_working":0.12},"55_59":{"employee":0.55,"entrepreneur":0.03,"student":0.00,"retired":0.28,"unemployed":0.05,"other_not_working":0.09},"60_69":{"employee":0.34,"entrepreneur":0.02,"student":0.00,"retired":0.52,"unemployed":0.04,"other_not_working":0.08},"70_90":{"employee":0.08,"entrepreneur":0.01,"student":0.00,"retired":0.82,"unemployed":0.03,"other_not_working":0.06}}
+    },
+    "income_monthly_rub": {
+      "male":{"18_24":{"mean":65000,"median":52000,"p90":120000},"25_29":{"mean":105000,"median":85000,"p90":190000},"30_34":{"mean":135000,"median":105000,"p90":240000},"35_39":{"mean":150000,"median":115000,"p90":270000},"40_49":{"mean":150000,"median":115000,"p90":270000},"50_59":{"mean":140000,"median":105000,"p90":250000},"60_69":{"mean":90000,"median":70000,"p90":160000},"70_90":{"mean":55000,"median":42000,"p90":95000}},
+      "female":{"18_24":{"mean":55000,"median":45000,"p90":100000},"25_29":{"mean":85000,"median":70000,"p90":155000},"30_34":{"mean":100000,"median":80000,"p90":180000},"35_39":{"mean":105000,"median":82000,"p90":190000},"40_49":{"mean":105000,"median":82000,"p90":190000},"50_59":{"mean":95000,"median":75000,"p90":170000},"60_69":{"mean":70000,"median":55000,"p90":125000},"70_90":{"mean":45000,"median":35000,"p90":80000}}
+    },
+    "height_cm": {
+      "male":{"mean":177.5,"sd":6.8,"age_adjustment":{"18_39":0,"40_59":-0.7,"60_90":-2.0}},
+      "female":{"mean":164.5,"sd":6.2,"age_adjustment":{"18_39":0,"40_59":-0.5,"60_90":-1.8}}
+    },
+    "weight_kg": {
+      "male":{"bmi_mean":{"18_29":23.5,"30_44":25.0,"45_59":27.0,"60_90":28.0},"bmi_sd":4.0},
+      "female":{"bmi_mean":{"18_29":22.5,"30_44":25.0,"45_59":28.0,"60_90":29.0},"bmi_sd":4.5},
+      "formula":"weight_kg = bmi * (height_cm / 100)^2"
+    },
+    "hair_color": {
+      "male":{"blonde":0.12,"light_brown":0.25,"brown":0.30,"dark":0.29,"red":0.02,"other":0.02},
+      "female":{"blonde":0.16,"light_brown":0.29,"brown":0.30,"dark":0.22,"red":0.02,"other":0.01}
+    },
+    "eye_color": {
+      "male":{"blue":0.22,"gray":0.28,"green":0.12,"brown":0.28,"hazel_other":0.10},
+      "female":{"blue":0.23,"gray":0.29,"green":0.13,"brown":0.25,"hazel_other":0.10}
+    },
+    "property": {
+      "male":{"18_24":0.18,"25_29":0.30,"30_39":0.46,"40_49":0.58,"50_59":0.66,"60_69":0.70,"70_90":0.72},
+      "female":{"18_24":0.20,"25_29":0.34,"30_39":0.51,"40_49":0.63,"50_59":0.70,"60_69":0.73,"70_90":0.74}
+    },
+    "smoking": {
+      "male":{"18_24":{"non_smoker":0.72,"smoker":0.22,"former_smoker":0.06},"25_39":{"non_smoker":0.61,"smoker":0.29,"former_smoker":0.10},"40_59":{"non_smoker":0.57,"smoker":0.31,"former_smoker":0.12},"60_90":{"non_smoker":0.66,"smoker":0.20,"former_smoker":0.14}},
+      "female":{"18_24":{"non_smoker":0.86,"smoker":0.11,"former_smoker":0.03},"25_39":{"non_smoker":0.77,"smoker":0.17,"former_smoker":0.06},"40_59":{"non_smoker":0.75,"smoker":0.17,"former_smoker":0.08},"60_90":{"non_smoker":0.82,"smoker":0.10,"former_smoker":0.08}}
+    },
+    "alcohol": {
+      "male":{"18_24":{"none_or_rare":0.35,"occasional":0.48,"regular":0.15,"frequent":0.02},"25_39":{"none_or_rare":0.25,"occasional":0.50,"regular":0.21,"frequent":0.04},"40_59":{"none_or_rare":0.25,"occasional":0.46,"regular":0.24,"frequent":0.05},"60_90":{"none_or_rare":0.37,"occasional":0.43,"regular":0.17,"frequent":0.03}},
+      "female":{"18_24":{"none_or_rare":0.48,"occasional":0.43,"regular":0.08,"frequent":0.01},"25_39":{"none_or_rare":0.36,"occasional":0.49,"regular":0.13,"frequent":0.02},"40_59":{"none_or_rare":0.38,"occasional":0.47,"regular":0.13,"frequent":0.02},"60_90":{"none_or_rare":0.50,"occasional":0.39,"regular":0.10,"frequent":0.01}}
+    }
+  },
+  "calculation_rules": {
+    "base_population": 100000000,
+    "age_interpolation": "For arbitrary age ranges, integrate the age-band distribution proportionally over the overlapping years.",
+    "continuous_height": "Use a normal distribution with sex/age-specific mean and SD.",
+    "continuous_weight": "Generate BMI from the specified distribution and derive weight from height.",
+    "income": "Approximate the income distribution with a log-normal distribution calibrated to median and p90.",
+    "categorical_filters": "Use conditional probabilities.",
+    "correlation_adjustments": [
+      "Higher education increases expected income.",
+      "Employment status strongly affects income.",
+      "Age affects marital status and children.",
+      "Property ownership increases with age.",
+      "Smoking and alcohol distributions vary by sex and age."
+    ],
+    "rounding": {
+      "counts": "human_readable",
+      "percentages": "maximum_2_decimal_places",
+      "rarity": "nearest_reasonable_integer"
+    },
+    "rarity_formula": "1 / (estimated_count / relevant_population)",
+    "relevant_population": "selected sex population when sex is selected; all adults otherwise"
+  },
+  "quality_labels": {
+    "high": "Mostly based on demographic/social statistics.",
+    "medium": "Combination of statistical and model-estimated distributions.",
+    "low": "Heavily dependent on synthetic assumptions, especially physical traits."
+  }
+}
+
+path = "/mnt/data/population_model.json"
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(model, f, ensure_ascii=False, indent=2)
+
+print(path)
