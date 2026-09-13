@@ -33,7 +33,7 @@ export default function App(){
  const reset=()=>{setFilters({sex:'female',ageMin:25,ageMax:40});setActive([])};
  return <main>
   <header><div className="brand"><span className="brand-mark">К</span><span>Круг поиска</span></div><span className="model">Модель РФ · {populationModel.reference_year}</span></header>
-  <section className="hero"><div className="eyebrow"><Sparkles size={14}/> Статистический калькулятор</div><h1>Сколько людей подходят<br/>под ваши критерии?</h1><p>Оцените распространённость заданного профиля среди<br className="desktop"/> взрослого населения России.</p></section>
+  <section className="hero"><div className="eyebrow"><Sparkles size={14}/> Designed by Valentin Chernyak</div><h1>Сколько людей подходят<br/>под ваши критерии?</h1><p>Оцените распространённость заданного профиля среди<br className="desktop"/> взрослого населения России.</p></section>
   <div className="layout">
    <section className="card form-card"><div className="section-title"><span>01</span><div><h2>Кого ищем?</h2><p>Задайте основные параметры</p></div></div>
     <label>Пол</label><div className="segment">{([['female','Женщину'],['male','Мужчину']] as [Sex,string][]).map(([v,l])=><button className={filters.sex===v?'selected':''} onClick={()=>set('sex',v)} key={v}>{l}</button>)}</div>
